@@ -440,10 +440,15 @@ pub(super) async fn connect(stream: DuplexStream) -> VncClient {
 }
 
 pub(super) async fn event(client: &VncClient) -> VncEvent {
-    tokio::time::timeout(Duration::from_secs(2), client.recv_event())
-        .await
-        .unwrap()
-        .unwrap()
+    loop {
+        let event = tokio::time::timeout(Duration::from_secs(2), client.recv_event())
+            .await
+            .unwrap()
+            .unwrap();
+        if !matches!(event, VncEvent::UpdateEnd) {
+            return event;
+        }
+    }
 }
 
 pub(super) fn rect_header(rect: Rect, encoding: u32) -> Vec<u8> {

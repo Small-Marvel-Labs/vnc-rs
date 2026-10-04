@@ -67,6 +67,11 @@ pub enum VncEvent {
     /// Encoding the bytes with base64 and render it with "<img src=data:image/jpeg;base64,.../>",
     ///
     JpegImage(Rect, ImageData),
+    /// Every rectangle of a FramebufferUpdate, including one with none, has
+    /// been emitted; the framebuffer is consistent and the next update can be
+    /// requested.
+    ///
+    UpdateEnd,
 
     // PngImage(Rect, ImageData),
     /// Will be generated if [crate::VncEncoding::CursorPseudo] is set

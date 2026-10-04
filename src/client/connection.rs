@@ -637,8 +637,10 @@ where
                         VncEncoding::LastRectPseudo => {
                             break;
                         }
-                        // Only ever advertised; it never describes a rectangle.
-                        VncEncoding::ExtendedClipboardPseudo => {
+                        // Only ever advertised; they never describe a rectangle.
+                        VncEncoding::ExtendedClipboardPseudo
+                        | VncEncoding::JpegQualityPseudo(_)
+                        | VncEncoding::CompressionLevelPseudo(_) => {
                             return Err(VncError::InvalidImageData);
                         }
                     }
@@ -651,6 +653,7 @@ where
                     desktop.observe(&update);
                     output_func(VncEvent::DesktopUpdate(update)).await?;
                 }
+                output_func(VncEvent::UpdateEnd).await?;
             }
             // SetColorMapEntries,
             ServerMsg::Bell => {

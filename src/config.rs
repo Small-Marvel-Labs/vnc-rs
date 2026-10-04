@@ -4,21 +4,24 @@ use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 /// All supported vnc encodings
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(i32)]
 pub enum VncEncoding {
-    Raw = 0,
-    CopyRect = 1,
+    Raw,
+    CopyRect,
     // Rre = 2,
     // Hextile = 5,
-    Tight = 7,
-    Trle = 15,
-    Zrle = 16,
-    CursorPseudo = -239,
-    DesktopSizePseudo = -223,
-    LastRectPseudo = -224,
-    ExtendedDesktopSizePseudo = -308,
+    Tight,
+    Trle,
+    Zrle,
+    CursorPseudo,
+    DesktopSizePseudo,
+    LastRectPseudo,
+    ExtendedDesktopSizePseudo,
     /// UTF-8 clipboard (0xC0A1E5CE).
-    ExtendedClipboardPseudo = -1063131698,
+    ExtendedClipboardPseudo,
+    /// Tight JPEG quality, 0 (smallest) to 9 (best); higher levels are sent as 9.
+    JpegQualityPseudo(u8),
+    /// Compression effort, 0 (fastest) to 9 (smallest); higher levels are sent as 9.
+    CompressionLevelPseudo(u8),
 }
 
 impl From<u32> for VncEncoding {
@@ -47,7 +50,21 @@ impl VncEncoding {
 
 impl From<VncEncoding> for u32 {
     fn from(e: VncEncoding) -> Self {
-        e as u32
+        let wire: i32 = match e {
+            VncEncoding::Raw => 0,
+            VncEncoding::CopyRect => 1,
+            VncEncoding::Tight => 7,
+            VncEncoding::Trle => 15,
+            VncEncoding::Zrle => 16,
+            VncEncoding::CursorPseudo => -239,
+            VncEncoding::DesktopSizePseudo => -223,
+            VncEncoding::LastRectPseudo => -224,
+            VncEncoding::ExtendedDesktopSizePseudo => -308,
+            VncEncoding::ExtendedClipboardPseudo => -1063131698,
+            VncEncoding::JpegQualityPseudo(level) => -32 + i32::from(level.min(9)),
+            VncEncoding::CompressionLevelPseudo(level) => -256 + i32::from(level.min(9)),
+        };
+        wire as u32
     }
 }
 

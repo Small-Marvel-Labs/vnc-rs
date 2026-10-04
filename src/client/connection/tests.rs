@@ -143,10 +143,17 @@ async fn raw_is_implicit_and_resize_changes_decoder_bounds() {
     assert!(matches!(result, Err(VncError::IoError(_))));
     let output = output.into_inner().unwrap();
     assert!(
+        matches!(
+            &output[..],
+            [_, VncEvent::UpdateEnd, _, VncEvent::UpdateEnd]
+        ),
+        "{output:?}"
+    );
+    assert!(
         matches!(&output[0], VncEvent::SetResolution(size) if (size.width, size.height) == (128, 96))
     );
     assert!(
-        matches!(&output[1], VncEvent::RawImage(rect, bytes) if (rect.x, rect.y) == (127, 95) && bytes == &[1, 2, 3, 255])
+        matches!(&output[2], VncEvent::RawImage(rect, bytes) if (rect.x, rect.y) == (127, 95) && bytes == &[1, 2, 3, 255])
     );
 }
 
