@@ -1,8 +1,9 @@
 use crate::{Rect, VncError};
 use tokio::io::{AsyncRead, AsyncReadExt};
 
-/// 8K UHD; callers enforce a smaller budget where memory is tight.
-pub(crate) const MAX_PIXELS: usize = 33_177_600;
+/// Two 8K UHD displays, since a Mac reports all its displays as one desktop;
+/// callers enforce a smaller budget where memory is tight.
+pub(crate) const MAX_PIXELS: usize = 66_355_200;
 /// Wide enough for side-by-side 5K displays.
 pub(crate) const MAX_DIMENSION: u16 = 16384;
 pub(crate) const MAX_COMPRESSED: usize = 64 * 1024 * 1024;
